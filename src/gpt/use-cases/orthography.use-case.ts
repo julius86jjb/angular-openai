@@ -27,15 +27,15 @@ export const orthographyCheckUseCase = async (openai: OpenAI, options: Options) 
                   message: string, // Uses emojis and text to congratulate user
                 }
                  
-                `
-
-                
+                `  
             },
             {
                 role: 'user',
                 content: prompt
             }
+
         ],
+        
         model: "gpt-3.5-turbo",
         temperature: 0.3,
         max_tokens: 150,

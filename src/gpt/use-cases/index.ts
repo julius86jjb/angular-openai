@@ -1,3 +1,5 @@
+export { translateUseCase } from "./translate.use-case";
+
 export { prosConsDicusserStreamUseCase } from "./prosConsDiscusserStream.use-case";
 
 export { prosConsDicusserUseCase } from "./prosConsDiscusser.use-case";

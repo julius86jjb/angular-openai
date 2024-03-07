@@ -20,6 +20,11 @@ lerna-debug.log*
 /coverage
 /.nyc_output
 
+# Generated content
+
+/generated/*
+!/generated/.gitkeep
+
 # IDEs and editors
 /.idea
 .project

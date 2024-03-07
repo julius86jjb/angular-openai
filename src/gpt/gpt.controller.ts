@@ -1,7 +1,11 @@
-import { Body, Controller, Get, HttpStatus, Param, Post, Res } from '@nestjs/common';
-import { GptService } from './gpt.service';
-import { OrthographyDto, ProsConsDiscusserDto, TextToAudioDto, TranslateDto } from './dtos';
 import { Response } from 'express';
+import { diskStorage } from 'multer';
+
+import { Body, Controller, FileTypeValidator, Get, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { GptService } from './gpt.service';
+import { AudioToTextDto, OrthographyDto, ProsConsDiscusserDto, TextToAudioDto, TranslateDto } from './dtos';
 
 
 // Controlador: sirven para escuchar peticiones y emitir respuestas
@@ -49,9 +53,10 @@ export class GptController {
   @Post('translate')
   translate(@Body() translateDto: TranslateDto) {
     return this.gptService.translate(translateDto);
-
-
   }
+
+
+
   @Post('text-to-audio')
   async textToAudio(
     @Body() textToAudioDto: TextToAudioDto,
@@ -65,7 +70,7 @@ export class GptController {
 
 
 
-  
+
   @Get('text-to-audio/:id')
   async getAudioFromText(
     @Res() res: Response,
@@ -76,6 +81,34 @@ export class GptController {
     res.setHeader('Content-Type', 'audio/mp3');
     res.status(HttpStatus.OK)
     res.sendFile(path);
+  }
+
+
+  @Post('audio-to-text')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './generated/uploads',
+        filename: (req, file, callback) => {
+          const fileExt = file.originalname.split('.').pop();
+          const fileName = `${new Date().getTime()}.${fileExt}`;
+          return callback(null, fileName);
+        }
+      })
+    })
+  )
+  async audioToText(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000 * 1024 * 5, message: 'File is bigger than 5MB' }),
+          new FileTypeValidator({ fileType: 'audio/*' })
+        ]
+      })) file: Express.Multer.File,
+      @Body() audioToTextDto: AudioToTextDto,
+  ) {
+    
+    return this.gptService.audioToText(file, audioToTextDto)
   }
 }
 

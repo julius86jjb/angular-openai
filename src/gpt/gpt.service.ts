@@ -1,15 +1,19 @@
 import * as path from 'path';
 import { existsSync } from 'fs';
 
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, flatten } from '@nestjs/common';
 
 import { OpenAI } from "openai";
 
-import { orthographyCheckUseCase, prosConsDicusserUseCase, prosConsDicusserStreamUseCase, translateUseCase, textoToAudioUseCase, audioToTextUseCase } from './use-cases';
-import { AudioToTextDto, OrthographyDto, ProsConsDiscusserDto, TextToAudioDto, TranslateDto } from './dtos';
+import { orthographyCheckUseCase, prosConsDicusserUseCase, prosConsDicusserStreamUseCase, translateUseCase, textoToAudioUseCase, audioToTextUseCase, imageGenerationUseCase, imageVariationUseCase } from './use-cases';
+import { AudioToTextDto, OrthographyDto, ProsConsDiscusserDto, TextToAudioDto, TranslateDto, ImageGenerationDto, ImageVariationDto } from './dtos';
+import * as fs from 'fs';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GptService {
+
+   private readonly configService: ConfigService
 
    private openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
@@ -39,6 +43,12 @@ export class GptService {
    }
 
 
+  
+
+   async audioToText(audioFile: Express.Multer.File, { prompt }: AudioToTextDto) {
+      return await audioToTextUseCase(this.openai, { audioFile, prompt });
+   }
+
    async getAudioFromText(id: string) {
       const filePath = path.resolve(__dirname, '../../generated/audios', `${id}.mp3`);
 
@@ -48,8 +58,26 @@ export class GptService {
 
    }
 
-   async audioToText(audioFile: Express.Multer.File, { prompt }: AudioToTextDto) {
-      return await audioToTextUseCase(this.openai, { audioFile, prompt });
+
+
+   async imageGeneration( imageGeneration: ImageGenerationDto) {
+      return await imageGenerationUseCase(this.openai, {...imageGeneration});
+   }
+
+   getGeneratedImage(id: string){
+      const filePath = path.resolve(__dirname, '../../generated/images', `${id}`);
+      
+      if(!existsSync(filePath)) throw new NotFoundException('Image not found');
+      // if(!fs.existsSync(filePath)) throw new NotFoundException('Image not found');
+
+      return filePath;
+   }
+
+
+   
+
+   async generateImageVariation( {baseImage}: ImageVariationDto) {
+      return await imageVariationUseCase(this.openai, {baseImage});
    }
 }
 

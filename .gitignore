@@ -25,6 +25,8 @@ lerna-debug.log*
 /generated/*
 !/generated/.gitkeep
 
+/md
+
 # IDEs and editors
 /.idea
 .project

@@ -115,8 +115,16 @@ export class GptController {
   @Post('image-generation')
   async imageGeneration(
     @Body() imageGenerationDto: ImageGenerationDto,
+    @Res() res: Response
   ) {
-    return await this.gptService.imageGeneration(imageGenerationDto);
+
+    try {
+      const resp = await this.gptService.imageGeneration(imageGenerationDto);
+      return res.status(HttpStatus.OK).json(resp)
+
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json(error.error)
+    }
   }
 
 
@@ -130,6 +138,7 @@ export class GptController {
     res.setHeader('Content-Type', 'image/png')
     res.status(HttpStatus.OK);
     res.sendFile(filePath);
+    
   }
 
   @Post('image-variation')

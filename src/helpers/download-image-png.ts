@@ -27,7 +27,6 @@ export const downloadImageAsPng = async (url: string, fullPath: boolean = false)
     .ensureAlpha()
     .toFile(completePath)
 
-
   return fullPath ? completePath : imageNamePng;
 }
 

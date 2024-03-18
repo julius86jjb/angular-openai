@@ -1,19 +1,16 @@
 import * as path from 'path';
 import { existsSync } from 'fs';
 
-import { BadRequestException, Injectable, NotFoundException, flatten } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { OpenAI } from "openai";
 
 import { orthographyCheckUseCase, prosConsDicusserUseCase, prosConsDicusserStreamUseCase, translateUseCase, textoToAudioUseCase, audioToTextUseCase, imageGenerationUseCase, imageVariationUseCase } from './use-cases';
 import { AudioToTextDto, OrthographyDto, ProsConsDiscusserDto, TextToAudioDto, TranslateDto, ImageGenerationDto, ImageVariationDto } from './dtos';
-import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GptService {
-
-   private readonly configService: ConfigService
 
    private openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
@@ -79,6 +76,8 @@ export class GptService {
    async generateImageVariation( {baseImage}: ImageVariationDto) {
       return await imageVariationUseCase(this.openai, {baseImage});
    }
+
+  
 }
 
 

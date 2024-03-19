@@ -12,7 +12,7 @@ interface Options {
 export const checkCompleteStatusUseCase = async (openai: OpenAI, { threadId, runId }: Options) => {
     const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
 
-    console.log(runStatus.status);
+    // console.log(runStatus.status);
 
     if (runStatus.status === 'completed') {
         return runStatus

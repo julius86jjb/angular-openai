@@ -1,18 +1,13 @@
 import OpenAI from "openai"
-import { threadId } from "worker_threads"
-
-interface Options {
-    threadId: string
-}
 
 
-export const getMessageListUseCase = async (openai: OpenAI, options: Options) => {
+export const getMessageListUseCase = async (openai: OpenAI, threadId: string) => {
 
-    const { threadId } = options;
+
 
     const messageList = await openai.beta.threads.messages.list(threadId)
 
-    console.log({messageList});
+    // console.log({messageList});
 
     const messages = messageList.data.map(message => ({
         role: message.role,
